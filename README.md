@@ -1,14 +1,15 @@
-# Demo RAG — políticas internas de Andes Retail
+# Analítica de Negocios Avanzada - UCEMA
+## Demo RAG — Consulta Sobre Políticas Internas
 
-Material ficticio para Analítica de Negocios Avanzada, UCEMA 2026, T07. Continúa el enfoque acordado en «Diseño de demo RAG»: hacer visibles recuperación, contexto, grounding, citas y abstención. La alineación se basa en esa conversación; el PDF de T07 no está incluido aquí.
+Ejercicio para practicar conceptos sobre **retrieval-augmented generation (RAG)**, continuación de la clase sobre "RAG y Sistemas con Conocimiento". El objetivo es hacer visibles recuperación, contexto, grounding, citas y abstención.
 
-La empresa, los montos y las reglas son inventados. El objetivo es que la respuesta dependa de evidencia recuperada. Un modelo sin el corpus puede abstenerse correctamente o acertar por casualidad: un acierto aislado no demuestra conocimiento de la empresa.
+En este ejercicio la empresa, los montos y las reglas son todos ficticios. El objetivo es que la respuesta dependa de evidencia recuperada. Un modelo sin el corpus puede abstenerse correctamente o acertar por casualidad: un acierto aislado no demuestra conocimiento de la empresa.
 
 ## Comenzar desde cero
 
-Este repositorio contiene las fuentes del ejercicio, no ejecuciones resueltas. Prepara el entorno siguiendo [ENTORNO.md](ENTORNO.md), configura tu propia clave en `.env` y ejecuta los notebooks **01 a 07 en orden**, de arriba abajo. En cada notebook utiliza un kernel nuevo o reinícialo antes de ejecutar todas sus celdas.
+Este repositorio contiene las fuentes del ejercicio, no ejecuciones resueltas. Prepará el entorno siguiendo [ENTORNO.md](ENTORNO.md), configurá tu propia clave en `.env` y ejecutá los notebooks **01 a 07 en orden**, de arriba abajo.
 
-| Notebook | Resultado que produces |
+| Notebook | Resultado a producir |
 |---|---|
 | 01 | Respuesta sin documentos |
 | 02 | Chunks y manifiesto en `data/` |
@@ -18,9 +19,9 @@ Este repositorio contiene las fuentes del ejercicio, no ejecuciones resueltas. P
 | 06 | Comprobación de equivalencia de Haystack y respuesta con su pipeline |
 | 07 | Comparación de búsquedas y veinte respuestas nuevas en `eval/improvements/` |
 
-Los notebooks 01, 04 y 06 hacen una llamada cada uno por defecto; el 05 hace diez y el 07 veinte: **33 llamadas** para una ejecución completa, sin repeticiones ni opciones adicionales. Cada ejecución de esas celdas consume API. Los notebooks 02 y 03 no usan OpenAI; el 03 descarga el modelo de embeddings la primera vez.
+Para completar este ejercicio se necesita tener acceso a una API de un LLM para poder generar las respuestas. Los notebooks 01, 04 y 06 hacen una llamada cada uno por defecto; el 05 hace diez y el 07 veinte: **33 llamadas** para una ejecución completa, sin repeticiones ni opciones adicionales. Cada ejecución de esas celdas consume API. Los notebooks 02 y 03 no usan LLMs; el 03 descarga el modelo de embeddings la primera vez. Este ejercicio se desarrolló usando la API de OpenAI, por lo cual es posible que necesites modificar el código de las llamadas al LLM si se elige un modelo / proveedor distinto.
 
-`data/`, `runs/`, `eval/results/` y `eval/improvements/` se crean localmente y están excluidos de Git. No copies resultados de otra persona. Las fichas de revisión semántica se generan sin completar: evalúa tus respuestas con la rúbrica y redacta tus conclusiones. El notebook 07 lee la última evaluación creada en el 05, sin nombres de ejecuciones predefinidos.
+`data/`, `runs/`, `eval/results/` y `eval/improvements/` se crean localmente y están excluidos de Git. No copies resultados de otra persona. Las fichas de revisión semántica se generan sin completar: evaluá tus respuestas con la rúbrica y redactá tus propias conclusiones. El notebook 07 lee la última evaluación creada en el 05, sin nombres de ejecuciones predefinidos.
 
 ## Archivos
 
@@ -43,7 +44,7 @@ Los archivos son UTF-8. Para preparar tu entorno local de JupyterLab, consultar 
 
 ## Primer notebook disponible
 
-Los notebooks incluyen explicaciones antes y después de cada bloque de código: propósito, sintaxis relevante, decisiones de diseño, resultado esperado y límites de lo comprobado. Ejecutar de arriba abajo y detenerse a inspeccionar las salidas. Para los próximos notebooks se mantendrá este nivel de explicación, pensado como material de clase y de lectura autónoma.
+Los notebooks incluyen explicaciones antes y después de cada bloque de código: propósito, sintaxis relevante, decisiones de diseño, resultado esperado y límites de lo comprobado. Ejecutar de arriba abajo y detenerse a inspeccionar las salidas.
 
 `notebooks/01_modelo_sin_rag.ipynb` implementa la consulta inicial sin documentos. Abrirlo desde JupyterLab y usar el kernel Python (rag-demo). Configuración y credenciales: [ENTORNO.md](ENTORNO.md). Esta etapa permite observar respuestas sin grounding antes de agregar recuperación.
 
@@ -59,7 +60,7 @@ La última celda genera `data/chunks.jsonl` y `data/manifest.json`, con huellas 
 
 `notebooks/03_embeddings_y_retrieval.ipynb` desarrolla el paso 5 con explicaciones antes de cada bloque: carga y comprobación de fuentes, modelo local, medición de tokens, embeddings normalizados, similitud coseno con NumPy, top-k e inspección de evidencia. Permite comparar preguntas y k = 1, 3 y 5 sin generar respuestas.
 
-Usa `intfloat/multilingual-e5-small` con revisión fija, CPU y caché dentro de `.cache/`. La primera carga requiere descargar el modelo; no se envía el corpus ni se usa la API de OpenAI. Instala las dependencias en tu propio virtualenv utilizando `requirements.txt`.
+Usa `intfloat/multilingual-e5-small` con revisión fija, CPU y caché dentro de `.cache/`. La primera carga requiere descargar el modelo; no se envía el corpus ni se usa la API del LLM. Instala las dependencias en tu propio virtualenv utilizando `requirements.txt`.
 
 El texto de embedding omite las claves administrativas del YAML y conserva título, audiencia, introducción, contexto y sección. Los chunks originales siguen completos. Se rechazan entradas demasiado largas para evitar truncamiento silencioso.
 
@@ -69,7 +70,7 @@ Genera `data/embeddings.npy`, `data/embeddings_manifest.json` y `data/retrieval_
 
 `notebooks/04_rag_completo.ipynb` implementa el paso 6 con explicaciones detalladas de cada bloque. Carga el índice existente, verifica huellas y orden de filas, recupera top-k y muestra el prompt completo antes de llamar al LLM. No modifica el recuperador ni incorpora respuestas esperadas.
 
-Usa OpenAI con la clave local y envía solo la pregunta, el contexto común y los fragmentos ficticios seleccionados. Ejecutar todas las celdas realiza **una llamada**, Q01 con k = 3 por defecto. Para otro caso, cambiar `CASO`/`K` y ejecutar desde la sección 3. La comparación controlada sin documentos es opcional y hace una llamada adicional con idénticas instrucciones.
+El código está armado para usar OpenAI con la clave local y envía solo la pregunta, el contexto común y los fragmentos ficticios seleccionados. Probablemente vas a tener que adaptarlo si se desea utilizar otro tipo de modelo. Ejecutar todas las celdas realiza **una llamada**, Q01 con k = 3 por defecto. Para otro caso, cambiar `CASO`/`K` y ejecutar desde la sección 3. La comparación controlada sin documentos es opcional y hace una llamada adicional con idénticas instrucciones.
 
 Pide estado, respuesta, citas e información faltante como JSON. Valida formato e IDs, sin confundir esa comprobación con respaldo semántico. La distinción entre falta de evidencia en top-k y ausencia en todo el corpus está explicada. `runs/` guarda trazas locales sin credenciales y queda excluido de Git. Todavía no usamos Pydantic ni respuesta estructurada forzada por la API.
 
@@ -77,7 +78,7 @@ Pide estado, respuesta, citas e información faltante como JSON. Valida formato 
 
 `notebooks/05_evaluacion_rag.ipynb` mide los diez casos manteniendo el recuperador, prompt y modelo del paso 6. Calcula cobertura documental a k = 1, 3 y 5, coincidencia de estados y validez local de formato/citas; la revisión semántica se registra por cada hecho y uso prohibido.
 
-Por defecto `EJECUTAR_API=True` genera diez consultas nuevas con costo, conservando cada respuesta y cualquier error. Después puedes usar `False` para volver a analizar tu propia ejecución sin llamadas. `eval/results/latest.json` identifica la corrida más reciente. Las carpetas de corridas contienen configuración, prompts, resultados, métricas automáticas y fichas semánticas; no contienen credenciales.
+Por defecto `EJECUTAR_API=True` genera diez consultas nuevas con costo, conservando cada respuesta y cualquier error. Después podés usar `False` para volver a analizar tu propia ejecución sin llamadas. `eval/results/latest.json` identifica la corrida más reciente. Las carpetas de corridas contienen configuración, prompts, resultados, métricas automáticas y fichas semánticas; no contienen credenciales.
 
 Q08 se excluye del promedio de cobertura porque no tiene documentos relevantes. Los errores técnicos siguen en el denominador de diez casos de las métricas de generación. Una cita válida por ID no implica respaldo de la afirmación; por eso no se presenta el resultado automático como calidad semántica total.
 
@@ -97,7 +98,7 @@ La preparación se puede inspeccionar sin llamar al LLM. La sección 8 realiza u
 
 Las pruebas de generación conservan literalmente el contexto de la corrida original. Primero cambia solo el formato, después las instrucciones manteniendo el esquema. Las variantes de búsqueda y filtros no se mezclan en esas llamadas; no se afirma haber evaluado su efecto combinado.
 
-Por defecto `EJECUTAR_API=True` realiza veinte consultas nuevas (dos variantes por diez preguntas), usando la última evaluación propia del notebook 05 como referencia. Después puedes usar `False` para analizar tus resultados sin llamadas; si cambias la evaluación base, debes generar una comparación nueva. No requiere dependencias nuevas. `eval/improvements/` conserva configuración, entradas, respuestas, métricas y fichas de revisión; la evaluación base permanece intacta.
+Por defecto `EJECUTAR_API=True` realiza veinte consultas nuevas (dos variantes por diez preguntas), usando la última evaluación propia del notebook 05 como referencia. Después podés usar `False` para analizar tus resultados sin llamadas; si cambiás la evaluación base, debés generar una comparación nueva. No requiere dependencias nuevas. `eval/improvements/` conserva configuración, entradas, respuestas, métricas y fichas de revisión; la evaluación base permanece intacta.
 
 ## Reglas de la simulación
 
@@ -106,17 +107,6 @@ Usar como fecha de consulta fija **2026-10-08**, aunque la demo se ejecute otro 
 La política global fija 60 días corridos desde el fin del viaje. El anexo argentino conserva ese plazo y permite, bajo condiciones, taxis sin comprobante hasta ARS 18.000 por traslado. El país de contratación y el lugar del taxi son condiciones distintas. Los 30 días de gastos generales y los 10 días de conciliación de tarjeta corresponden a otros trámites.
 
 La política archivada conserva el antiguo plazo de 30 días desde la compra. La FAQ contiene **deliberadamente un dato incorrecto de 45 días**: permanece publicada, pero tiene menor autoridad. No corregir ese dato al preparar la demo. La precedencia está declarada en los documentos: anexo aplicable en sus excepciones, política global para el resto y FAQ como orientación. La fecha más reciente no decide por sí sola la autoridad.
-
-## Secuencia pedagógica sugerida
-
-1. Preguntar Q01 y Q09 al modelo sin documentos y observar si inventa o reconoce el límite.
-2. Leer los seis documentos; separar preparación del corpus de atención de consultas.
-3. Dividir por secciones, conservando juntas reglas y condiciones. Adjuntar a cada chunk `document_id`, título, versión, estado, vigencia, jurisdicción, audiencia, autoridad, sección y archivo fuente. No separar la excepción de su ámbito de aplicación.
-4. Mostrar recuperación sin generación: consulta, top-k, fragmentos y scores. Probar k = 1, 3 y 5. Inspeccionar si esos fragmentos bastan para responder antes de llamar al modelo.
-5. Construir el contexto y pedir respuesta con estado, hechos sustentados y citas por documento/sección. El score de similitud no equivale a autoridad ni a probabilidad de que la respuesta sea correcta.
-6. Evaluar por separado retrieval y generación. Más adelante, organizar el mismo flujo mínimo en componentes de Haystack, sin cambiar corpus ni preguntas.
-
-BM25 y embeddings pueden compararse con Q01/Q02; no se garantiza que dense gane en este corpus pequeño. Mantener iguales chunks y k al comparar. Empezar con todos los documentos permite observar contaminación; luego incorporar filtros de vigencia y alcance. En Q03 conviene recuperar el archivo histórico para explicar la regla citada, identificándolo como evidencia histórica. Un filtro que borre todos los documentos viejos perdería esa explicación.
 
 ## Qué enseña cada caso
 
