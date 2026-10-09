@@ -1,0 +1,11 @@
+# Dependencias directas; requirements.txt fija la instalación validada.
+jupyterlab>=4,<5
+ipykernel>=6,<8
+ipywidgets>=8,<9
+numpy>=2,<3
+PyYAML>=6,<7
+python-dotenv>=1,<2
+pydantic>=2,<3
+openai
+sentence-transformers
+haystack-ai>=3.3,<4

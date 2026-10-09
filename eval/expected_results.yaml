@@ -1,0 +1,126 @@
+schema_version: "1.0"
+as_of_date: "2026-10-08"
+common_context: "Andes Retail; reglas actuales; viajes finalizados en 2026 salvo indicación contraria. No inferir datos personales ausentes."
+# Identificadores iguales a document_id del front matter; no son rutas.
+# relevant_documents: evidencia necesaria para la respuesta completa, incluida
+# la explicación de contradicciones. No implica que toda fuente sea normativa.
+# irrelevant_documents: distractores seleccionados, lista no exhaustiva.
+# required_facts: criterios semánticos, no coincidencias literales.
+cases:
+  - id: Q01
+    expected_status: answered
+    relevant_documents: [VIAJES-GLOBAL-V4]
+    irrelevant_documents: [GASTOS-GENERALES-V3, TARJETAS-V1, VIAJES-GLOBAL-V2, FAQ-VIAJES-V1]
+    required_facts:
+      - "60 días corridos posteriores a la finalización del viaje, incluido el día 60."
+      - "El plazo no se cuenta desde la compra; presentar no garantiza aprobación."
+    must_not_use:
+      - "30 días desde la compra, 45 días desde el fin del viaje o 10 días desde el cierre como plazo de este reintegro."
+    notes: "Citar V1. Baseline de retrieval y grounding; la palabra gastos también atrae distractores."
+
+  - id: Q02
+    expected_status: answered
+    relevant_documents: [VIAJES-GLOBAL-V4]
+    irrelevant_documents: [GASTOS-GENERALES-V3, TARJETAS-V1, VIAJES-GLOBAL-V2, FAQ-VIAJES-V1]
+    required_facts:
+      - "60 días corridos desde la finalización del viaje para solicitar el reintegro."
+      - "El dinero de bolsillo se interpreta como pago personal, no como cargo corporativo."
+    must_not_use:
+      - "Inventar un plazo de pago o prometer que el dinero será devuelto dentro de 60 días."
+    notes: "Citar V1. Comparar con Q01 en BM25 y dense; una mejora semántica es hipótesis a medir, no resultado garantizado."
+
+  - id: Q03
+    expected_status: answered
+    relevant_documents: [VIAJES-GLOBAL-V4, VIAJES-GLOBAL-V2]
+    irrelevant_documents: [GASTOS-GENERALES-V3, TARJETAS-V1]
+    required_facts:
+      - "No sigue vigente para ese viaje: V2 expiró el 2025-12-31."
+      - "V4 aplica a viajes finalizados desde el 2026-01-01: 60 días corridos desde el fin del viaje."
+    must_not_use:
+      - "Aplicar el plazo histórico de 30 días a un viaje finalizado en 2026."
+    notes: "Citar H1/H3 y V1/V3. V2 es relevante para explicar el origen de la regla, no para autorizarla hoy."
+
+  - id: Q04
+    expected_status: answered
+    relevant_documents: [VIAJES-AR-V2, VIAJES-GLOBAL-V4]
+    irrelevant_documents: [VIAJES-GLOBAL-V2, GASTOS-GENERALES-V3, TARJETAS-V1]
+    required_facts:
+      - "No hay un plazo argentino diferente para pasajes."
+      - "Se mantienen 60 días corridos desde la finalización del viaje."
+    must_not_use:
+      - "Extender la excepción de taxis al plazo para pasajes."
+    notes: "Citar A1 y V1. El anexo confirma la regla global; recuperar ambos permite comprobar alcance y fundamento."
+
+  - id: Q05
+    expected_status: answered
+    relevant_documents: [VIAJES-AR-V2, VIAJES-GLOBAL-V4]
+    irrelevant_documents: [VIAJES-GLOBAL-V2, GASTOS-GENERALES-V3, TARJETAS-V1]
+    required_facts:
+      - "Puede presentarlo bajo la excepción: contratación argentina y taxi realizado en Argentina por ARS 17.500, menor que el límite inclusivo de ARS 18.000 por traslado."
+      - "Debe adjuntar declaración con fecha, origen, destino y motivo laboral, y obtener aprobación del responsable directo."
+      - "Se mantiene el plazo de 60 días desde el fin del viaje; presentación no equivale a aprobación automática."
+    must_not_use:
+      - "Negarlo solo por falta de comprobante o aplicar el límite a todo el viaje."
+      - "Extender la excepción a otros gastos, a taxis fuera de Argentina o a cualquier persona que visite Argentina."
+    notes: "Citar A1/A2 y V1/V2. Verificar condiciones juntas; un chunk que pierda la audiencia puede producir una autorización incorrecta."
+
+  - id: Q06
+    expected_status: answered
+    relevant_documents: [VIAJES-GLOBAL-V4, FAQ-VIAJES-V1]
+    irrelevant_documents: [VIAJES-GLOBAL-V2, GASTOS-GENERALES-V3, TARJETAS-V1]
+    required_facts:
+      - "El plazo aplicable es 60 días corridos desde el fin del viaje."
+      - "La FAQ dice 45, pero es orientación no normativa; prevalece la política global."
+      - "Una fecha posterior de publicación de la FAQ no le da mayor autoridad."
+    must_not_use:
+      - "Promediar plazos, elegir 45 por prudencia o declarar el conflicto irresoluble."
+    notes: "Citar V1/V3 y F2 más el aviso de la FAQ. Conflicto deliberado y resoluble por autoridad, incluso con ambas fuentes vigentes."
+
+  - id: Q07
+    expected_status: answered
+    relevant_documents: [TARJETAS-V1]
+    irrelevant_documents: [VIAJES-GLOBAL-V4, VIAJES-AR-V2, VIAJES-GLOBAL-V2, FAQ-VIAJES-V1, GASTOS-GENERALES-V3]
+    required_facts:
+      - "Bloquear inmediatamente la tarjeta desde la aplicación del emisor."
+      - "Luego avisar a Tesorería en Mesa de Ayuda, categoría Tarjetas, sin esperar al cierre."
+    must_not_use:
+      - "Usar los plazos de reintegro o conciliación como tiempo disponible para bloquear."
+      - "Inventar teléfono, dirección de correo o URL."
+    notes: "Citar T2. El contexto viaje es ruido: la acción solicitada pertenece a tarjetas."
+
+  - id: Q08
+    expected_status: no_answer
+    relevant_documents: []
+    irrelevant_documents: [VIAJES-GLOBAL-V4, VIAJES-AR-V2, VIAJES-GLOBAL-V2, GASTOS-GENERALES-V3, TARJETAS-V1, FAQ-VIAJES-V1]
+    required_facts:
+      - "El corpus no establece un porcentaje de cobertura odontológica; no se puede determinar."
+    must_not_use:
+      - "Inventar un porcentaje o convertir ausencia de información en cobertura del 0 %."
+      - "Deducir inexistencia de un beneficio de salud a partir de la exclusión de gastos personales en gastos generales."
+    notes: "No hay evidencia que responda. G3 puede citarse solo para delimitar su alcance, no como respuesta al porcentaje. Recall no aplica con conjunto relevante vacío."
+
+  - id: Q09
+    expected_status: insufficient_evidence
+    relevant_documents: [VIAJES-GLOBAL-V4]
+    irrelevant_documents: [VIAJES-GLOBAL-V2, GASTOS-GENERALES-V3, TARJETAS-V1, FAQ-VIAJES-V1]
+    required_facts:
+      - "Falta conocer cuándo terminó el viaje; pedir esa fecha."
+      - "El plazo es de 60 días corridos desde el fin del viaje, no desde la compra."
+    must_not_use:
+      - "Responder sí o no de forma definitiva usando los 75 días desde la compra."
+      - "Suponer una fecha de regreso o equiparar compra y finalización."
+    notes: "Citar V1. Retrieval puede ser correcto y aun así no alcanzar para decidir el caso individual."
+
+  - id: Q10
+    expected_status: insufficient_evidence
+    relevant_documents: [VIAJES-GLOBAL-V4, GASTOS-GENERALES-V3, TARJETAS-V1]
+    irrelevant_documents: [VIAJES-GLOBAL-V2, FAQ-VIAJES-V1]
+    required_facts:
+      - "Pedir tipo de gasto y si se pagó con dinero personal o tarjeta corporativa."
+      - "Viaje con pago personal: 60 días desde el fin del viaje; insumos laborales fuera de viaje con pago personal: 30 días desde la compra."
+      - "Tarjeta corporativa: conciliación dentro de 10 días desde el cierre del resumen."
+      - "Pedir la fecha de referencia correspondiente si se quiere determinar el vencimiento concreto."
+    must_not_use:
+      - "Elegir un único plazo sin aclarar el tipo de gasto y medio de pago."
+      - "Tratar conciliación y reintegro como el mismo trámite."
+    notes: "Citar V1/V3, G1/G2 y T1. Se exige una aclaración acompañada de alternativas condicionales para evaluar cobertura de tres fuentes."

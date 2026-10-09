@@ -1,0 +1,14 @@
+.venv/
+.env
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+.jupyter-local/
+work/
+.cache/
+runs/
+
+# Resultados que cada alumno genera al ejecutar los notebooks
+data/
+eval/results/
+eval/improvements/
